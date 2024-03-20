@@ -1,6 +1,7 @@
 #include "sql_agent.h"
-#include "file_renamer.h"
+#include "file_actions.h"
 #include "sql_actions.h"
+#include "rdf_actions.h"
 
 namespace fs = std::filesystem;
 
@@ -80,11 +81,15 @@ int main(int argc, char* argv[])
 
         // Initialize and reset result_id
         std::string result_id = "";
-
         // Keeps us from updating the local filename if the published pdf path is not updated in the mysql DB
-        bool pub_path_updated = false;
+        bool db_path_updated = false;
+        bool local_path_updated = false;
+        // Reset page range tracker array
+        std::array<std::string,2> page_range{"",""};
+        // Reset extracted pub acronym
+        std::string pub = "";
 
-        /* SQL DATABASE UPDATING */
+        /* UPDATING SQL DATABASE FOR PUBLISHED PAPER */
         try { 
             // Execute a SELECT query to retrieve ID field for the entry
             result_id = sql_agent::retrieve_field(query, result, temp_filename, "ID");
@@ -92,6 +97,7 @@ int main(int argc, char* argv[])
 
             if (result_id != "") {
                 std::cout << "Starting SQL Database Updates for ID: " + result_id << std::endl;
+                pub = rdf::get_acronym(result_id, '-');
 
                 // Constructing new volume string
                 std::string new_vol_str = year_str + vol_str + "000" + iss_str;
@@ -105,11 +111,12 @@ int main(int argc, char* argv[])
 
                 // Constructing new citiation string
                 std::string new_citationString = year_str + ", Volume " + vol_str + ", Issue " + iss_str;
-                std::string last_page = sql_agent::retrieve_field(query, result, temp_filename, "TotalNumpages");
+                page_range[1] = sql_agent::retrieve_field(query, result, temp_filename, "TotalNumpages");
                 std::string page_count = sql_agent::retrieve_field(query, result, temp_filename, "NumberOfPages");
-                if (last_page != "" && page_count != "") {
-                    int first_page_num = std::stoi(last_page) - std::stoi(page_count) + 1;
-                    new_citationString += ", pages " + std::to_string(first_page_num) + " - " + last_page;
+                if (page_range[1] != "" && page_count != "") {
+                    int first_page_num = std::stoi(page_range[1]) - std::stoi(page_count) + 1;
+                    page_range[0] = std::to_string(first_page_num);
+                    new_citationString += ", pages " + page_range[0] + " - " + page_range[1];
                 }
                 // Execute query to UPDATE citationString for the given ID
                 std::cout << "New Citation String (ID: " + result_id + "): " + new_citationString << std::endl;
@@ -117,11 +124,11 @@ int main(int argc, char* argv[])
 
                 // Updating the temp copy of the filename to update the DB
                 file::rename_temp_filename(temp_filename, newVolumeNum, newIssueNum);
-                std::string new_Published_PDF_File = "/Pubs/EBFT08/" + year_str + "/Volume" + vol_str + "/" + temp_filename;
+                std::string new_Published_PDF_File = "/Pubs/" + pub + "/" + year_str + "/Volume" + vol_str + "/" + temp_filename;
                 std::cout << "New Published PDF Filepath (ID: " + result_id + "): " + new_Published_PDF_File << std::endl;
                 // Execute query to UPDATE Published_PDF_File for the given ID
                 sql_agent::update_field_by_ID(query, result_id, "Published_PDF_File", new_Published_PDF_File);
-                pub_path_updated = true;
+                db_path_updated = true;
 
                 std::cout << "Successfully Updated SQL Database for ID: " << result_id << std::endl;
             } else {
@@ -133,16 +140,40 @@ int main(int argc, char* argv[])
             continue;
         }
 
-        /* UPDATING FILE IN THE FILE EXPLORER */
+        /* UPDATING FILENAME FOR PUBLISHED PAPER */
         try {
-            if (pub_path_updated) {
+            if (db_path_updated) {
+                // Update filename
                 file::rename_file(entry, newVolumeNum, newIssueNum);
+                local_path_updated = true;
             } else {
                 std::cout << "Skipped updating the filename locally." << std::endl;
             }
         } catch (const std::exception& e) {
             std::cerr << "Error: " << e.what() << std::endl;
-            std::cerr << "Failed to update filename: " + entry.path().string();
+            std::cerr << "Failed to update filename: " + entry.path().string() << std::endl;
+            continue;
+        }
+
+        /* UPDATING RDF CONTENTS FOR PUBLISHED PAPER */
+        try {
+            if (local_path_updated) {
+                // Updates RDF, uses the ID to find associated rdf 
+                // then finds line containing the given criteria with the given string
+                std::string new_url = "http://";
+                new_url += "www.accessecon.com/Pubs/";
+                new_url += pub + "/" + year_str + "/Volume" + vol_str + "/" + temp_filename;
+
+                rdf::update_rdf_line(result_id, "File-URL:", new_url);
+                rdf::update_rdf_line(result_id, "Pages:", page_range[0] + " - " + page_range[1]);
+                rdf::update_rdf_line(result_id, "Volume:", vol_str);
+                rdf::update_rdf_line(result_id, "Issue:", iss_str);
+            } else {
+                std::cout << "Skipped updating the rdf contents." << std::endl;
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Error: " << e.what() << std::endl;
+            std::cerr << "Failed to update all rdf contents." << std::endl;
             continue;
         }
     }
@@ -152,12 +183,3 @@ int main(int argc, char* argv[])
 
     return 0;
 }
-
-// Notes
-/*
-// for back dating the publication date
--[If Needed] Publish Date
-// possibly required, too early to tell
-- [Maybe] Current_Status
-- [Maybe] Content_ID
-*/

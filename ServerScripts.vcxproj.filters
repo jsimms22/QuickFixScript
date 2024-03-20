@@ -18,7 +18,7 @@
     <ClCompile Include="source\sql_agent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\file_renamer.cpp">
+    <ClCompile Include="source\file_actions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\main.cpp">
@@ -27,15 +27,21 @@
     <ClCompile Include="source\sql_actions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\rdf_actions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\file_renamer.h">
+    <ClInclude Include="include\file_actions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\sql_agent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\sql_actions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rdf_actions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

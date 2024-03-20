@@ -151,13 +151,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="source\file_renamer.cpp" />
+    <ClCompile Include="source\file_actions.cpp" />
     <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\rdf_actions.cpp" />
     <ClCompile Include="source\sql_actions.cpp" />
     <ClCompile Include="source\sql_agent.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\file_renamer.h" />
+    <ClInclude Include="include\file_actions.h" />
+    <ClInclude Include="include\rdf_actions.h" />
     <ClInclude Include="include\sql_actions.h" />
     <ClInclude Include="include\sql_agent.h" />
   </ItemGroup>
