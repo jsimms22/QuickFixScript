@@ -2,6 +2,7 @@
 #include "file_actions.h"
 #include "sql_actions.h"
 #include "rdf_actions.h"
+#include "pdf_actions.h"
 
 namespace fs = std::filesystem;
 
@@ -84,6 +85,7 @@ int main(int argc, char* argv[])
         // Keeps us from updating the local filename if the published pdf path is not updated in the mysql DB
         bool db_path_updated = false;
         bool local_path_updated = false;
+        bool rdf_updated = false;
         // Reset page range tracker array
         std::array<std::string,2> page_range{"",""};
         // Reset extracted pub acronym
@@ -165,15 +167,37 @@ int main(int argc, char* argv[])
                 new_url += pub + "/" + year_str + "/Volume" + vol_str + "/" + temp_filename;
 
                 rdf::update_rdf_line(result_id, "File-URL:", new_url);
-                rdf::update_rdf_line(result_id, "Pages:", page_range[0] + " - " + page_range[1]);
+                if ((std::stoi(page_range[1]) - std::stoi(page_range[0])) == 0) {
+                    rdf::update_rdf_line(result_id, "Pages:", page_range[0] + " - " + page_range[1]);
+                } else {
+                    rdf::update_rdf_line(result_id, "Pages:", page_range[1]);
+                }
                 rdf::update_rdf_line(result_id, "Volume:", vol_str);
                 rdf::update_rdf_line(result_id, "Issue:", iss_str);
+
+                rdf_updated = true;
             } else {
                 std::cout << "Skipped updating the rdf contents." << std::endl;
             }
         } catch (const std::exception& e) {
             std::cerr << "Error: " << e.what() << std::endl;
-            std::cerr << "Failed to update all rdf contents." << std::endl;
+            std::cerr << "Failed to update all rdf contents for ID: " + result_id << std::endl;
+            continue;
+        }
+
+        /* UPDATING HTML AND PDF TITLE PAGES FOR PUBLISHED PAPER */
+        try {
+            if (local_path_updated && rdf_updated) {
+                // Updates the stand-alone html title page (if it exists)
+                pdf::update_html(result_id, newVolumeNum, newIssueNum);
+                // Overwrites existing stand-alone pdf title page with updated html version
+                pdf::update_pdf(result_id);
+            } else {
+                std::cout << "Skipped updating the title page." << std::endl;
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Error: " << e.what() << std::endl;
+            std::cerr << "Failed to update all title page for ID: " + result_id << std::endl;
             continue;
         }
     }

@@ -26,9 +26,9 @@ namespace rdf
 		std::array<std::string, 4> acronyms{ "EBFT08","EB","777wps777","VUECON" };
 
 		if (pub.compare(acronyms[0]) == 0) {
-			// dir = "C:/inetpub/vhosts/accessecon.com/httpdocs/RePEc/EBF/ebfull";
+			dir = "C:/inetpub/vhosts/accessecon.com/httpdocs/RePEc/EBF/ebfull";
 			// Local testing directory only:
-			dir = "C:/Users/work/Desktop/ebfull";
+			// dir = "C:/Users/work/Desktop/ebfull";
 		} else if (pub.compare(acronyms[1]) == 0) {
 			dir = "C:/inetpub/vhosts/accessecon.com/httpdocs/RePEc/ebl/ecbull";
 		} else if (pub.compare(acronyms[2]) == 0) {
@@ -49,8 +49,8 @@ namespace rdf
 
 	std::string get_rdf_path(const std::string& id) 
 	{
-		std::string dir = rdf::get_rdf_dir(id);
-		return dir + "/" + id + ".rdf";
+		std::string path = rdf::get_rdf_dir(id);
+		return path + "/" + id + ".rdf";
 	}
 
 	// Expected search criteria: "Volume:" or "Issue:" or "Pages:"
