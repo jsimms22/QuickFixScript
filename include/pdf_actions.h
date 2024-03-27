@@ -36,4 +36,6 @@ namespace pdf
 	std::string get_pub_paper_path(const fs::directory_entry, const std::string&, const std::string);
 
 	void remove_title_page(const fs::directory_entry, const std::string&, const std::string);
+
+	void update_title_page(const fs::directory_entry, const std::string&, const std::string);
 }

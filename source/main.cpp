@@ -194,6 +194,7 @@ int main(int argc, char* argv[])
                 // Overwrites existing stand-alone pdf title page with updated html version
                 pdf::update_pdf(result_id);
                 pdf::remove_title_page(entry, result_id, temp_filename);
+                pdf::update_title_page(entry, result_id, temp_filename);
             } else {
                 std::cout << "Skipped updating the title page." << std::endl;
             }

@@ -154,6 +154,7 @@ namespace pdf
 			pdf_path = entry.path().parent_path().string();
 			pdf_path += "/" + filename;
 		} else {
+			// For debugging:
 			// pdf_path = pdf::get_dir(id);
 			// pdf_path += "/2024/Volume0/" + filename;
 		}
@@ -191,7 +192,7 @@ namespace pdf
 				std::string cmd_options = "-dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dFirstPage=2 -sOutputFile=";
 				std::string cmd = ghost_script_bin + " " + cmd_options + pdf_out + " " + temp_pdf_in;
 
-				int result = std::system(cmd);
+				int result = std::system(cmd.c_str());
 				// For debugging:
 				// std::cout << cmd << std::endl;
 				// int result = 0;
@@ -205,6 +206,56 @@ namespace pdf
 			}
 		} else {
 			std::cerr << "Unexpected filetype, returning without removing original title page." << std::endl;
+			return;
+		}
+	}
+
+	void update_title_page(const fs::directory_entry entry, const std::string& id, const std::string filename)
+	{
+		std::string pub = rdf::get_acronym(id, '-');
+		std::string base_path = pdf::get_dir(id);
+		// Mimicking the naming conventions of the paperGenerator.php script used by the 
+		// website: pdf_out <-> pdfOut) and temp_pdf_in <-> tempPdfIn
+		std::string temp_pdf_in =base_path + "/GeneralPDF" + pub;
+		temp_pdf_in += "/" + id + "_finalPaper_ScriptFix2.pdf";
+		std::string title_page_pdf = base_path + "/" + id + "Pub.pdf";
+		std::string pdf_out = pdf::get_pub_paper_path(entry, id, filename);
+
+		bool copied = false;
+		if (fs::is_regular_file(pdf_out.c_str())) {
+			// Creating a copy of the published paper
+			if (fs::exists(temp_pdf_in)) {
+				copied = fs::copy_file(pdf_out, temp_pdf_in, fs::copy_options::overwrite_existing);
+			} else {
+				copied = fs::copy_file(pdf_out, temp_pdf_in, fs::copy_options::none);
+			}
+
+			if (!copied) {
+				std::cerr << "Error (ID:" + id + "): Did not create copy of " << pdf_out << std::endl;
+				if (fs::exists(temp_pdf_in)) { fs::remove(temp_pdf_in); }
+				else { return; }
+			}
+			else {
+				// Run the ghostscript exe that is already used by the server
+				std::string ghost_script_bin = "C:/inetpub/vhosts/accessecon.com/httpdocs/ghostscript/bin/gswin32c.exe";
+				std::string cmd_options = "-dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -sOutputFile=";
+				std::string cmd = ghost_script_bin + " " + cmd_options + pdf_out + " " + title_page_pdf + " " + temp_pdf_in;
+
+				int result = std::system(cmd.c_str());
+				// For debugging:
+				// std::cout << cmd << std::endl;
+				// int result = 0;
+				// system() will return 0 if successful, -1 if failed
+				if (result == 0) {
+					std::cout << "New title page successfully added to the published PDF." << std::endl;
+				}
+				else {
+					std::cerr << "Error (ID: " + id + "): " + "Failed to remove old title page." << std::endl;
+					return;
+				}
+			}
+		} else {
+			std::cerr << "Unexpected filetype, returning without adding new title page." << std::endl;
 			return;
 		}
 	}
