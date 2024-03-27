@@ -171,7 +171,7 @@ namespace pdf
 		std::string pdf_out = pdf::get_pub_paper_path(entry, id, filename);
 
 		bool copied = false;
-		if (fs::is_regular_file(pdf_out)) {
+		if (fs::is_regular_file(pdf_out.c_str())) {
 			std::string temp_pdf_in = base_path + "/" + id + "finalPaper_ScriptFix.pdf";
 
 			// Creating a copy of the published paper
