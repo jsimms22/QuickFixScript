@@ -2,7 +2,7 @@
 
 namespace rdf
 {
-	std::string get_acronym(const std::string& id, char delimiter)
+	std::string get_acronym(const std::string& id, const char delimiter)
 	{
 		std::vector<std::string> pieces;
 		std::istringstream iss(id);
@@ -21,7 +21,7 @@ namespace rdf
 
 		char delimiter = '-';
 		std::string pub = rdf::get_acronym(id, delimiter);
-		std::cout << "Looking for publication rdf dir (ID:" + id + "): " + pub << std::endl;
+		// std::cout << "Looking for publication rdf dir (ID:" + id + "): " + pub << std::endl;
 
 		std::array<std::string, 4> acronyms{ "EBFT08","EB","777wps777","VUECON" };
 
@@ -40,9 +40,9 @@ namespace rdf
 		}
 
 		if (dir == "") { 
-			std::cout << "Could not find existing rdf directory. Returning empty string." << std::endl; 
+			std::cerr << "Could not find existing rdf directory. Returning empty string." << std::endl; 
 		} else {
-			std::cout << "Returning rdf dir (ID:" + id + "): " + dir << std::endl;
+			//std::cout << "Returning rdf dir (ID:" + id + "): " + dir << std::endl;
 		}
 		return dir;
 	}
@@ -53,22 +53,25 @@ namespace rdf
 		return path + "/" + id + ".rdf";
 	}
 
-	// Expected search criteria: "Volume:" or "Issue:" or "Pages:"
-	void update_rdf_line(const std::string& id, const std::string criteria, const std::string new_num_str)
+	// Read from the current state of an rdf into a temp file while updating lines containing the criteria
+	void write_to_temp(
+		const std::string& rdf_path, 
+		const std::string& id, 
+		const std::string criteria, 
+		const std::string new_str)
 	{
-		std::string rdf_path = rdf::get_rdf_path(id);
-
-		std::ifstream input_file(rdf_path);
-		if (!input_file.is_open()) {
-			std::cerr << "Error (ID: " + id + "): " + "Unable to open file: " + rdf_path << std::endl;
+		// Open rdf file for read and write access
+		std::ifstream read_rdf_file(rdf_path);
+		if (!read_rdf_file.is_open()) {
+			std::cerr << "Error (ID: " + id + "): " + "Unable to open file for read: " + rdf_path << std::endl;
 			return;
 		}
 
-		// Open the temporary output file for writing
-		std::ofstream temp_file("temp.rdf");
-		if (!temp_file.is_open()) {
-			std::cerr << "Error: Unable to open temporary file temp.rdf" << std::endl;
-			input_file.close();
+		// Create and open a temporary file for write access
+		std::ofstream write_temp_file("temp.rdf");
+		if (!write_temp_file.is_open()) {
+			std::cerr << "Error: Unable to open temporary file temp.rdf for write" << std::endl;
+			read_rdf_file.close();
 			return;
 		}
 
@@ -76,32 +79,68 @@ namespace rdf
 		bool found_line = false;
 
 		// Read each line from the file
-		while (std::getline(input_file, line)) {
+		while (std::getline(read_rdf_file, line)) {
 			// Check if the line begins with the criteria string
 			if (line.find(criteria) == 0) {
 				found_line = true;
-				// Write the new line with the updated volume number
-				temp_file << criteria + " " + new_num_str << std::endl;
+				// Write the new line with the new string
+				write_temp_file << criteria + " " + new_str << std::endl;
 			}
 			else {
 				// Write the original line to the temporary file
-				temp_file << line << std::endl;
+				write_temp_file << line << std::endl;
 			}
 		}
 
-		input_file.close();
-		temp_file.close();
+		read_rdf_file.close();
+		write_temp_file.close();
 
-		// Remove the original file
-		if (found_line) {
-			std::remove(rdf_path.c_str());
-			// Rename the temporary file to the original file name
-			std::rename("temp.rdf", rdf_path.c_str());
-		}
-		else {
-			std::cerr << "Error: Line starting with 'Volume: ' not found in file" << std::endl;
-			// Remove the temporary file
+		if (!(found_line)) {
+			std::cerr << "Error: Line starting with '" + criteria + "' not found in file" << std::endl;
 			std::remove("temp.rdf");
+			throw;
+		}
+	}
+
+	// Read from a temp file and overwrite the current state of an rdf file
+	void read_from_temp(const std::string& rdf_path, const std::string& id)
+	{
+		// Open rdf file for write access
+		std::ofstream write_rdf_file(rdf_path);
+		if (!write_rdf_file.is_open()) {
+			std::cerr << "Error (ID: " + id + "): " + "Unable to open file for write: " + rdf_path << std::endl;
+			return;
+		}
+
+		// Open the temporary input file for reading
+		std::ifstream read_temp_file("temp.rdf");
+		if (!read_temp_file.is_open()) {
+			std::cerr << "Error: Unable to open temporary file temp.rdf for read" << std::endl;
+			write_rdf_file.close();
+			return;
+		}
+
+		std::string line;
+		// Rewrite the original file to maintain permissions
+		while (std::getline(read_temp_file, line)) {
+			write_rdf_file << line << std::endl;
+		}
+
+		// Close open files
+		write_rdf_file.close();
+		read_temp_file.close();
+		std::remove("temp.rdf");
+	}
+
+	// Expected search criteria: "Volume:" or "Issue:" or "Pages:"
+	void update_rdf_line(const std::string& id, const std::string criteria, const std::string new_str)
+	{
+		std::string rdf_path = rdf::get_rdf_path(id);
+		try {
+			write_to_temp(rdf_path, id, criteria, new_str);
+			read_from_temp(rdf_path, id);
+		} catch (const std::exception& e) {
+			std::cerr << "Error: " << e.what() << std::endl;
 		}
 	}
 }

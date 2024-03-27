@@ -22,13 +22,13 @@ int main(int argc, char* argv[])
     // Check if the new volume number makes sense
     int newVolumeNum = std::stoi(argv[2]);
     if (newVolumeNum < 20 || newVolumeNum >= 100) {
-        std::cerr << "Error: invalid new volume number. Must be in the range of [20,100)." << std::endl;
+        std::cerr << "Error: invalid new volume number. Must be in the range of [20,99]." << std::endl;
         return 1;
     }
     // Check if the new issue number makes sense
     int newIssueNum = std::stoi(argv[3]);
-    if (newIssueNum < 0 || newIssueNum >= 5) {
-       std::cerr << "Error: invalid new issue number. Must be in the range of [0,5)." << std::endl;
+    if (newIssueNum < 0 || newIssueNum >= 10) {
+       std::cerr << "Error: invalid new issue number. Must be in the range of [0,9]." << std::endl;
        return 1;
     }
     // Convert integers to strings for updating the database for an entry
@@ -166,11 +166,12 @@ int main(int argc, char* argv[])
                 new_url += "www.accessecon.com/Pubs/";
                 new_url += pub + "/" + year_str + "/Volume" + vol_str + "/" + temp_filename;
 
+                // Update rdf for each line that contains the following fields
                 rdf::update_rdf_line(result_id, "File-URL:", new_url);
                 if ((std::stoi(page_range[1]) - std::stoi(page_range[0])) == 0) {
-                    rdf::update_rdf_line(result_id, "Pages:", page_range[0] + " - " + page_range[1]);
-                } else {
                     rdf::update_rdf_line(result_id, "Pages:", page_range[1]);
+                } else {
+                    rdf::update_rdf_line(result_id, "Pages:", page_range[0] + " - " + page_range[1]);
                 }
                 rdf::update_rdf_line(result_id, "Volume:", vol_str);
                 rdf::update_rdf_line(result_id, "Issue:", iss_str);
@@ -184,7 +185,7 @@ int main(int argc, char* argv[])
             std::cerr << "Failed to update all rdf contents for ID: " + result_id << std::endl;
             continue;
         }
-
+       
         /* UPDATING HTML AND PDF TITLE PAGES FOR PUBLISHED PAPER */
         try {
             if (local_path_updated && rdf_updated) {
@@ -192,6 +193,7 @@ int main(int argc, char* argv[])
                 pdf::update_html(result_id, newVolumeNum, newIssueNum);
                 // Overwrites existing stand-alone pdf title page with updated html version
                 pdf::update_pdf(result_id);
+                pdf::remove_title_page(entry, result_id, temp_filename);
             } else {
                 std::cout << "Skipped updating the title page." << std::endl;
             }

@@ -13,11 +13,15 @@ namespace rdf
 {
 	namespace fs = std::filesystem;
 
-	std::string get_acronym(const std::string&, char);
+	std::string get_acronym(const std::string&, const char);
 
 	std::string find_rdf_dir(const std::string&);
 
 	std::string get_rdf_path(const std::string&);
+
+	void write_to_temp(const std::string&, const std::string&, const std::string, const std::string);
+
+	void read_from_temp(const std::string&, const std::string&);
 
 	void update_rdf_line(const std::string&, const std::string, const std::string);
 }

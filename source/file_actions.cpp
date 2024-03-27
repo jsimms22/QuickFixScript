@@ -26,7 +26,7 @@ namespace file
         }
     }
 
-    void rename_file(const fs::directory_entry& entry, int new_vol, int new_iss)
+    void rename_file(const fs::directory_entry& entry, const int new_vol, const int new_iss)
     {
         assert(new_vol >= 0);
         assert(new_iss >= 0);
@@ -49,10 +49,13 @@ namespace file
 
                 std::cout << newFileName << std::endl;
             }
+        } else {
+            std::cerr << "Unexpected filetype, returning without updating filename." << std::endl;
+            return;
         }
     }
 
-    void rename_temp_filename(std::string& temp_filename, int new_vol, int new_iss)
+    void rename_temp_filename(std::string& temp_filename, const int new_vol, const int new_iss)
     {
         assert(new_vol >= 0);
         assert(new_iss >= 0);

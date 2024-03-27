@@ -18,11 +18,7 @@ namespace file
 
 	void build_file_array(const std::string&, std::vector<fs::directory_entry>&);
 
-	void rename_file(const fs::directory_entry&, int, int);
+	void rename_file(const fs::directory_entry&, const int, const int);
 
-	void rename_temp_filename(std::string&, int, int);
-
-	// void rename_volume_num(const std::string&, int);
-
-	// void rename_issue_num(const std::string&, int);
+	void rename_temp_filename(std::string&, const int, const int);
 }
