@@ -9,6 +9,7 @@
 //#include <poppler/cpp/poppler-document.h>
 //#include <poppler/cpp/poppler-page.h>
 #include <filesystem>
+#include <array>
 
 namespace pdf 
 {
@@ -27,9 +28,9 @@ namespace pdf
 
 	std::string update_title(const std::string&, const int, const int);
 
-	std::string update_citation(const std::string&, const int, const int);
+	std::string update_citation(const std::string&, const int, const int, const std::array<std::string,2>&);
 
-	void update_html(const std::string&, const int, const int);
+	void update_html(const std::string&, const int, const int, const std::array<std::string,2>&);
 
 	void update_pdf(const std::string&);
 

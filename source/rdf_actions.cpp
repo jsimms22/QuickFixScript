@@ -28,7 +28,7 @@ namespace rdf
 		if (pub.compare(acronyms[0]) == 0) {
 			dir = "C:/inetpub/vhosts/accessecon.com/httpdocs/RePEc/EBF/ebfull";
 			// Local testing directory only:
-			// dir = "C:/Users/work/Desktop/ebfull";
+			 dir = "C:/Users/work/Desktop/ebfull";
 		} else if (pub.compare(acronyms[1]) == 0) {
 			dir = "C:/inetpub/vhosts/accessecon.com/httpdocs/RePEc/ebl/ecbull";
 		} else if (pub.compare(acronyms[2]) == 0) {
@@ -50,6 +50,7 @@ namespace rdf
 	std::string get_rdf_path(const std::string& id) 
 	{
 		std::string path = rdf::get_rdf_dir(id);
+		assert(path != "");
 		return path + "/" + id + ".rdf";
 	}
 
@@ -66,7 +67,6 @@ namespace rdf
 			std::cerr << "Error (ID: " + id + "): " + "Unable to open file for read: " + rdf_path << std::endl;
 			return;
 		}
-
 		// Create and open a temporary file for write access
 		std::ofstream write_temp_file("temp.rdf");
 		if (!write_temp_file.is_open()) {
@@ -77,16 +77,14 @@ namespace rdf
 
 		std::string line;
 		bool found_line = false;
-
 		// Read each line from the file
 		while (std::getline(read_rdf_file, line)) {
 			// Check if the line begins with the criteria string
 			if (line.find(criteria) == 0) {
 				found_line = true;
-				// Write the new line with the new string
+				// Write the new line with the new string to the temporary file
 				write_temp_file << criteria + " " + new_str << std::endl;
-			}
-			else {
+			} else {
 				// Write the original line to the temporary file
 				write_temp_file << line << std::endl;
 			}
@@ -111,7 +109,6 @@ namespace rdf
 			std::cerr << "Error (ID: " + id + "): " + "Unable to open file for write: " + rdf_path << std::endl;
 			return;
 		}
-
 		// Open the temporary input file for reading
 		std::ifstream read_temp_file("temp.rdf");
 		if (!read_temp_file.is_open()) {
@@ -129,6 +126,7 @@ namespace rdf
 		// Close open files
 		write_rdf_file.close();
 		read_temp_file.close();
+		// Delete local file: temp.rdf
 		std::remove("temp.rdf");
 	}
 
@@ -141,6 +139,10 @@ namespace rdf
 			read_from_temp(rdf_path, id);
 		} catch (const std::exception& e) {
 			std::cerr << "Error: " << e.what() << std::endl;
+			throw e;
+		} catch (...) {
+			std::cerr << "Unknown error occurred while updating the rdf's contents." << std::endl;
+			throw;
 		}
 	}
 }

@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
 {
     /* Testing and capturing .exe inputs */
     if (argc != 7) {
-        std::cerr << "Usage: " << argv[0] << " <directory_path> <new_volume_number> <new_issue_number> <db_schema> <root> <password>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <directory_path> <new_volume_number> <new_issue_number> <db_schema_name> <username> <password>" << std::endl;
         return 1;
     }
     std::string directoryPath = argv[1];
@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
     sql::Statement* query = mysql_db.get_connection()->createStatement();
     sql::ResultSet* result = nullptr;
     
-    /* Loop operations
+    /* LOOP OPERATION OVERVIEW
     * 1) Verify the file entry is acceptable to use
     * 2) Reset loop variables
     * 3) Retrieve the ID of the file from the database, if we find an ID do the following:
@@ -73,6 +73,10 @@ int main(int argc, char* argv[])
     *       3.4.1) If we updated the published pdf filepath then set pub_path_updated = true;
     * 4) If pub_path_updated = true then,
     *   4.1) Update the filename in file explorer to match the new Published_PDF_File field in the database
+    * 5) If local_path_update = true then,
+    *   5.1) Update the associated rdf
+    * 6) If local_path_updated = true && rdf_updated = true
+    *   6.1) Update the title page for published paper entry
     */
     for (const auto& entry : file_vec) {
         if (!fs::is_regular_file(entry) && !file::is_pdf(entry.path().filename().string())) continue;
@@ -130,13 +134,18 @@ int main(int argc, char* argv[])
                 std::cout << "New Published PDF Filepath (ID: " + result_id + "): " + new_Published_PDF_File << std::endl;
                 // Execute query to UPDATE Published_PDF_File for the given ID
                 sql_agent::update_field_by_ID(query, result_id, "Published_PDF_File", new_Published_PDF_File);
-                db_path_updated = true;
 
+                // Execute query to UPDATE Publish_Date for the given ID
+                std::string new_Publish_Date = year_str + "-12-31 00:00:00";
+                std::cout << "New Published Date (ID: " + result_id + "): " + new_Publish_Date << std::endl;
+                sql_agent::update_field_by_ID(query, result_id, "Publish_Date", new_Publish_Date);
+
+                db_path_updated = true;
                 std::cout << "Successfully Updated SQL Database for ID: " << result_id << std::endl;
             } else {
                 std::cerr << "Retrieved empty ID string, moving to next file." << std::endl;
             }
-        } catch (sql::SQLException& e) {
+        } catch (const sql::SQLException& e) {
             std::cerr << "Query error: " << e.what() << std::endl;
             std::cerr << "Failed to update all SQL fields for ID: " + result_id << std::endl;
             continue;
@@ -190,17 +199,19 @@ int main(int argc, char* argv[])
         try {
             if (local_path_updated && rdf_updated) {
                 // Updates the stand-alone html title page (if it exists)
-                pdf::update_html(result_id, newVolumeNum, newIssueNum);
+                pdf::update_html(result_id, newVolumeNum, newIssueNum, page_range);
                 // Overwrites existing stand-alone pdf title page with updated html version
                 pdf::update_pdf(result_id);
+                // Removes the current title page from a published paper
                 pdf::remove_title_page(entry, result_id, temp_filename);
+                // Cats the title created during update_pdf() with the original published paper (minus old title) 
                 pdf::update_title_page(entry, result_id, temp_filename);
             } else {
-                std::cout << "Skipped updating the title page." << std::endl;
+                std::cout << "Skipped updating with new title page." << std::endl;
             }
         } catch (const std::exception& e) {
             std::cerr << "Error: " << e.what() << std::endl;
-            std::cerr << "Failed to update all title page for ID: " + result_id << std::endl;
+            std::cerr << "Failed to update title page for ID: " + result_id << std::endl;
             continue;
         }
     }

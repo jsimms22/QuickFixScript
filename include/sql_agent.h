@@ -21,9 +21,9 @@ namespace sql_agent
 	public:
 		MySQL_Interface();
 
-		void set_server(Protocol, std::string, std::string);
-		void set_schema(std::string);
-		void set_user(std::string, std::string);
+		void set_server(const Protocol, const std::string, const std::string);
+		void set_schema(const std::string);
+		void set_user(const std::string, const std::string);
 		void set_driver();
 		void set_connection();
 

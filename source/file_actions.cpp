@@ -2,10 +2,7 @@
 
 namespace file
 {
-    bool directory_exists(const std::string& dir) 
-    {
-        return fs::is_directory(dir);
-    }
+    bool directory_exists(const std::string& dir) { return fs::is_directory(dir); }
 
     bool is_pdf(const std::string& filename) {
         // Convert the filename to lowercase for case-insensitive comparison
