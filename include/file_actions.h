@@ -20,5 +20,9 @@ namespace file
 
 	void rename_file(const fs::directory_entry&, const int, const int);
 
+	void rename_file(const fs::directory_entry&, const int, const int, const int);
+
 	void rename_temp_filename(std::string&, const int, const int);
+
+	void rename_temp_filename(std::string&, const int, const int, const int);
 }

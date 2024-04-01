@@ -20,11 +20,30 @@ namespace sql_agent
         return output;
     }
 
+    std::string retrieve_field(
+        sql::Statement* query,
+        sql::ResultSet* result, 
+        const std::string paper_num,
+        const std::string pub_dir,
+        const std::string field)
+    {
+        std::string output = "";
+        // SELECT Published_PDF_File FROM acces24_minhviet.tablepaper WHERE Published_PDF_File LIKE '%-P8.pdf' AND Published_PDF_File LIKE '/Pubs/EBFT08/2024/Volume44%';
+        result = query->executeQuery
+        ("SELECT " + field + " FROM tablepaper WHERE Published_PDF_File LIKE '%-P" + paper_num + ".pdf' AND Published_PDF_File LIKE '" + pub_dir + "%'; ");
+
+        // Retrieve the row
+        if (result->next()) { output = result->getString(1); }
+        else { std::cout << "No rows found." << std::endl; }
+
+        return output;
+    }
+
     // Execute query to UPDATE field with input_str for the given id
     void update_field_by_ID(
         sql::Statement* query,
-        const std::string id, 
-        const std::string field, 
+        const std::string id,
+        const std::string field,
         const std::string input_str)
     {
         query->executeUpdate

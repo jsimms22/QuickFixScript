@@ -52,6 +52,39 @@ namespace file
         }
     }
 
+    void rename_file(const fs::directory_entry& entry, const int new_vol, const int new_iss, const int new_paper_num)
+    {
+        assert(new_vol >= 0);
+        assert(new_iss >= 0);
+        assert(new_paper_num >= 0);
+
+        std::regex pattern1("-V(\\d+)");
+        std::regex pattern2("-I(\\d+)");
+        std::regex pattern3("-P(\\d+)");
+
+        if (fs::is_regular_file(entry)) {
+            std::string oldFileName = entry.path().filename().string();
+            std::cout << "Changing filename locally: " + oldFileName + " -> ";
+            std::smatch match;
+
+            if (std::regex_search(oldFileName, match, pattern1) && std::regex_search(oldFileName, match, pattern2)) {
+                // Construct the new file name
+                std::string newFileName = std::regex_replace(oldFileName, pattern1, "-V" + std::to_string(new_vol));
+                newFileName = std::regex_replace(newFileName, pattern2, "-I" + std::to_string(new_iss));
+                newFileName = std::regex_replace(newFileName, pattern3, "-P" + std::to_string(new_paper_num));
+
+                // Rename the file
+                fs::rename(entry.path(), entry.path().parent_path() / newFileName);
+
+                std::cout << newFileName << std::endl;
+            }
+        }
+        else {
+            std::cerr << "Unexpected filetype, returning without updating filename." << std::endl;
+            return;
+        }
+    }
+
     void rename_temp_filename(std::string& temp_filename, const int new_vol, const int new_iss)
     {
         assert(new_vol >= 0);
@@ -67,6 +100,29 @@ namespace file
             // Construct the new file name
             temp_filename = std::regex_replace(oldFileName, pattern1, "-V" + std::to_string(new_vol));
             temp_filename = std::regex_replace(temp_filename, pattern2, "-I" + std::to_string(new_iss));
+        }
+    }
+
+    void rename_temp_filename(std::string& temp_filename, const int new_vol, const int new_iss, const int new_paper_num)
+    {
+        assert(new_vol >= 0);
+        assert(new_iss >= 0);
+        assert(new_paper_num >= 0);
+
+        std::regex pattern1("-V(\\d+)");
+        std::regex pattern2("-I(\\d+)");
+        std::regex pattern3("-P(\\d+)");
+
+        std::string old_filename = temp_filename;
+        std::smatch match;
+
+        if (std::regex_search(temp_filename, match, pattern1) && 
+            std::regex_search(temp_filename, match, pattern2) &&
+            std::regex_search(temp_filename, match, pattern3)) {
+            // Construct the new file name
+            temp_filename = std::regex_replace(old_filename, pattern1, "-V" + std::to_string(new_vol));
+            temp_filename = std::regex_replace(temp_filename, pattern2, "-I" + std::to_string(new_iss));
+            temp_filename = std::regex_replace(temp_filename, pattern3, "-P" + std::to_string(new_paper_num));
         }
     }
 }

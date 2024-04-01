@@ -7,6 +7,7 @@
 #include <cppconn/statement.h>
 // standard library headers
 #include <memory>
+#include <string>
 
 namespace sql_agent
 {

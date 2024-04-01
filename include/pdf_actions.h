@@ -20,9 +20,7 @@ namespace pdf
 		HTML
 	};
 
-	std::string get_html_dir(const std::string&);
-
-	std::string get_html_path(const std::string&);
+	std::string get_dir(const std::string&);
 
 	std::string get_path(const std::string&, const pdf::FileType);
 
