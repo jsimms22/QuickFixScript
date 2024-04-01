@@ -87,6 +87,8 @@ namespace pdf
 		std::regex page_pattern_6(R"(p.A\d+)"); // p.A#
 		// Publication year
 		std::regex year_pattern(R"(, \\(\\d{4}\\))"); // , (year)
+		// Publication String
+		std::regex date_pattern("<b>Published:</b> (\\w+ \\d{1,2}, \\d{4})\\");
 
 		// Create replacements for regex patterns
 		std::string cit_vol = "Volume " + std::to_string(new_vol);
@@ -96,6 +98,7 @@ namespace pdf
 			cit_pages = "pages " + page_range[1];
 		}
 		std::string cit_year = ", (" + std::to_string((new_vol - 20) + 2000) + ")";
+		std::string date_publication = "<b>Published:</b> December 31, " + std::to_string((new_vol - 20) + 2000);
 
 		// Replacement for volume
 		std::string updated_content = std::regex_replace(html_content, volume_pattern, cit_vol);
