@@ -112,10 +112,10 @@ int main(int argc, char* argv[])
     * 1) Verify the file entry is acceptable to use
     * 2) Reset loop variables
     * 3) Retrieve the ID of the file from the database, if we find an ID do the following:
-    *   3.1) Execute query to UPDATE Volume_Number for the given ID
-    *   3.2) Execute query to UPDATE NumIssue for the given ID
-    *   3.3) Execute query to UPDATE citationString for the given ID
-    *   3.4) Execute query to UPDATE Published_PDF_File for the given ID
+    *   3.1) Execute query to UPDATE Volume_Number
+    *   3.2) Execute query to UPDATE NumIssue
+    *   3.3) Execute query to UPDATE citationString
+    *   3.4) Execute query to UPDATE Published_PDF_File
     *       3.4.1) If we updated the published pdf filepath then set pub_path_updated = true;
     * 4) If pub_path_updated = true then,
     *   4.1) Update the filename in file explorer to match the new Published_PDF_File field in the database
@@ -199,17 +199,28 @@ int main(int argc, char* argv[])
                     // Execute query to UPDATE Published_PDF_File for the given ID
                     sql_agent::update_field_by_ID(query, result_id, "Published_PDF_File", new_Published_PDF_File);
 
-                    // Build calendar stamp for new publish date 
+                    // Build calendar stamp for new publish date
+                    // Year_str is required for it to populate properly on the site
+                    // Site will order by publish date, not page #
                     std::string new_Publish_Date = year_str + "-12-31";
                     // Get current time for the timestamp and convert to std::string format
                     std::time_t current_time = std::time(nullptr);
-                    char buffer[20];
-                    std::strftime(buffer, sizeof(buffer), "%T", std::localtime(&current_time));
-                    std::string time_str = std::string(buffer);
+                    char pub_buffer[20];
+                    std::strftime(pub_buffer, sizeof(pub_buffer), "%T", std::localtime(&current_time));
+                    std::string time_str = std::string(pub_buffer);
                     new_Publish_Date += " " + time_str;
                     // Execute query to UPDATE Publish_Date for the given ID
                     std::cout << "New Published Date (ID: " + result_id + "): " + new_Publish_Date << std::endl;
                     sql_agent::update_field_by_ID(query, result_id, "Publish_Date", new_Publish_Date);
+
+                    // Build calendar stamp for new status date (today's date)
+                    std::time_t status_timestamp = std::time(nullptr);
+                    char status_buffer[25];
+                    std::strftime(status_buffer, sizeof(status_buffer), "%F %T", std::localtime(&status_timestamp));
+                    std::string status_str = std::string(status_buffer);
+                    // Execute query to UPDATE Status_Date for the given ID
+                    std::cout << "New Status Date (ID: " + result_id + "): " + status_str << std::endl;
+                    sql_agent::update_field_by_ID(query, result_id, "Status_date", status_str);
 
                     db_path_updated = true;
                     std::cout << "Successfully Updated SQL Database for ID: " << result_id << std::endl;
@@ -358,17 +369,28 @@ int main(int argc, char* argv[])
                     // Execute query to UPDATE Published_PDF_File for the given ID
                     sql_agent::update_field_by_ID(query, result_id, "Published_PDF_File", new_Published_PDF_File);
 
-                    // Build new publish date string
+                    // Build calendar stamp for new publish date
+                    // Year_str is required for it to populate properly on the site
+                    // Site will order by publish date, not page #
                     std::string new_Publish_Date = year_str + "-12-31";
                     // Get current time for the timestamp and convert to std::string format
                     std::time_t current_time = std::time(nullptr);
-                    char buffer[20];
-                    std::strftime(buffer, sizeof(buffer), "%T", std::localtime(&current_time));
-                    std::string time_str = std::string(buffer);
+                    char pub_buffer[20];
+                    std::strftime(pub_buffer, sizeof(pub_buffer), "%T", std::localtime(&current_time));
+                    std::string time_str = std::string(pub_buffer);
                     new_Publish_Date += " " + time_str;
                     // Execute query to UPDATE Publish_Date for the given ID
                     std::cout << "New Published Date (ID: " + result_id + "): " + new_Publish_Date << std::endl;
                     sql_agent::update_field_by_ID(query, result_id, "Publish_Date", new_Publish_Date);
+
+                    // Build calendar stamp for new status date (today's date)
+                    std::time_t status_timestamp = std::time(nullptr);
+                    char status_buffer[25];
+                    std::strftime(status_buffer, sizeof(status_buffer), "%F %T", std::localtime(&status_timestamp));
+                    std::string status_str = std::string(status_buffer);
+                    // Execute query to UPDATE Status_Date for the given ID
+                    std::cout << "New Status Date (ID: " + result_id + "): " + status_str << std::endl;
+                    sql_agent::update_field_by_ID(query, result_id, "Status_date", status_str);
 
                     db_path_updated = true;
                     std::cout << "Successfully Updated SQL Database for ID: " << result_id << std::endl;
