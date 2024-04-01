@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
             // Initialize and reset result_id
             std::string result_id = "";
 
-            // Keeps us from updating the local filename if the published pdf path is not updated in the mysql DB
+            // Keeps us from updating later on if there are failures early on
             bool db_path_updated = false;
             bool local_path_updated = false;
             bool rdf_updated = false;
