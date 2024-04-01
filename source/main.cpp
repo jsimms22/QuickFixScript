@@ -37,7 +37,9 @@ int main(int argc, char* argv[])
     int newPaperNum = std::stoi(argv[4]);
     if (newPaperNum < 0) {
         std::cerr << "Error: invalid last article number. Should be equivalent to the sequence number for the last paper published to the desired volume." << std::endl;
-        std::cerr << "For example: if the last published article in volume 44 has the filename 'V44-I1-P26', then last article number should be set to 26." << std::endl;
+        std::cerr << "For example: if the last published article in volume 44 has the filename 'V44-I1-P26', ";
+        std::cerr << "then last article number should be set to 26." << std::endl;
+        std::cerr << "If this is a new volume with no prior issues then set last article number to 0." << std::endl;
         return 1;
     }
     std::string schema = argv[5];
@@ -77,7 +79,6 @@ int main(int argc, char* argv[])
     std::string l_paper_dir; 
     std::string l_paper_pdf_path; 
     std::string l_pub_id;
-
     if (newPaperNum != 0) {
         l_paper_pub = rdf::get_acronym(file_vec[0].path().filename().string(), '-');
         l_paper_dir = "/Pubs/" + l_paper_pub + "/" + year_str + "/Volume" + vol_str;
@@ -199,7 +200,7 @@ int main(int argc, char* argv[])
                     sql_agent::update_field_by_ID(query, result_id, "Published_PDF_File", new_Published_PDF_File);
 
                     // Build calendar stamp for new publish date 
-                    std::string new_Publish_Date = year_str + "-12-01";
+                    std::string new_Publish_Date = year_str + "-12-31";
                     // Get current time for the timestamp and convert to std::string format
                     std::time_t current_time = std::time(nullptr);
                     char buffer[20];
@@ -244,14 +245,17 @@ int main(int argc, char* argv[])
                     std::string new_url = "http://";
                     new_url += "www.accessecon.com/Pubs/";
                     new_url += pub + "/" + year_str + "/Volume" + vol_str + "/" + temp_filename;
+                    std::string new_creation_date = year_str + "-12-31";
 
                     // Update rdf for each line that contains the following fields
+                    rdf::update_rdf_line(result_id, "Creation-Date:", new_creation_date);
                     rdf::update_rdf_line(result_id, "File-URL:", new_url);
                     if ((std::stoi(page_range[1]) - std::stoi(page_range[0])) == 0) {
                         rdf::update_rdf_line(result_id, "Pages:", page_range[1]);
                     } else {
                         rdf::update_rdf_line(result_id, "Pages:", page_range[0] + " - " + page_range[1]);
                     }
+                    rdf::update_rdf_line(result_id, "Year:", year_str);
                     rdf::update_rdf_line(result_id, "Volume:", vol_str);
                     rdf::update_rdf_line(result_id, "Issue:", iss_str);
 
@@ -355,7 +359,7 @@ int main(int argc, char* argv[])
                     sql_agent::update_field_by_ID(query, result_id, "Published_PDF_File", new_Published_PDF_File);
 
                     // Build new publish date string
-                    std::string new_Publish_Date = year_str + "-12-01";
+                    std::string new_Publish_Date = year_str + "-12-31";
                     // Get current time for the timestamp and convert to std::string format
                     std::time_t current_time = std::time(nullptr);
                     char buffer[20];
@@ -400,14 +404,17 @@ int main(int argc, char* argv[])
                     std::string new_url = "http://";
                     new_url += "www.accessecon.com/Pubs/";
                     new_url += pub + "/" + year_str + "/Volume" + vol_str + "/" + temp_filename;
+                    std::string new_creation_date = year_str + "-12-31";
 
                     // Update rdf for each line that contains the following fields
+                    rdf::update_rdf_line(result_id, "Creation-Date:", new_creation_date);
                     rdf::update_rdf_line(result_id, "File-URL:", new_url);
                     if ((std::stoi(page_range[1]) - std::stoi(page_range[0])) == 0) {
                         rdf::update_rdf_line(result_id, "Pages:", page_range[1]);
                     } else {
                         rdf::update_rdf_line(result_id, "Pages:", page_range[0] + " - " + page_range[1]);
                     }
+                    rdf::update_rdf_line(result_id, "Year:", year_str);
                     rdf::update_rdf_line(result_id, "Volume:", vol_str);
                     rdf::update_rdf_line(result_id, "Issue:", iss_str);
 
