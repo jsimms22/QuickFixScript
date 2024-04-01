@@ -14,8 +14,8 @@ namespace pdf
 		std::array<std::string, 4> acronyms{ "EBFT08","EB","777wps777","VUECON" };
 		if (pub.compare(acronyms[0]) == 0) {
 			dir = "C:/inetpub/vhosts/accessecon.com/httpdocs/pubs/EBFT08";
-			// Local testing directory only:
-			 dir = "C:/Users/work/Desktop/EBFT08";
+			// Local testing and debugging directory only:
+			//dir = "C:/Users/work/Desktop/EBFT08";
 		} else if (pub.compare(acronyms[1]) == 0) {
 			dir = "C:/inetpub/vhosts/accessecon.com/httpdocs/pubs/EB";
 		} else if (pub.compare(acronyms[2]) == 0) {
@@ -168,9 +168,9 @@ namespace pdf
 		std::string cmd = html_pdf_converter;
 		cmd += " " + html_path + " " + pdf_path;
 
-		//int result = system(cmd.c_str());
+		int result = system(cmd.c_str());
 		// For debugging purposes
-		std::cout << cmd << std::endl; int result = 0;
+		//std::cout << cmd << std::endl; int result = 0;
 		
 		// system() will return 0 if successful, -1 if failed
 		if (result == 0) {
@@ -189,7 +189,7 @@ namespace pdf
 			pdf_path += "/" + filename;
 		} else {
 			// For debugging:
-			 pdf_path = pdf::get_dir(id); pdf_path += "/2024/Volume0/" + filename;
+			//pdf_path = pdf::get_dir(id); pdf_path += "/2024/Volume0/" + filename;
 		}
 		assert(pdf_path != "");
 		return pdf_path;
@@ -226,9 +226,9 @@ namespace pdf
 				std::string cmd_options = "-dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dFirstPage=2 -sOutputFile=";
 				std::string cmd = ghost_script_bin + " " + cmd_options + pdf_out + " " + temp_pdf_in;
 
-				//int result = std::system(cmd.c_str());
+				int result = std::system(cmd.c_str());
 				// For debugging:
-				std::cout << cmd << std::endl; int result = 0;
+				//std::cout << cmd << std::endl; int result = 0;
 				
 				// system() will return 0 if successful, -1 if failed
 				if (result == 0) {
@@ -278,9 +278,9 @@ namespace pdf
 				std::string cmd_options = "-dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -sOutputFile=";
 				std::string cmd = ghost_script_bin + " " + cmd_options + pdf_out + " " + title_page_pdf + " " + temp_pdf_in;
 
-				//int result = std::system(cmd.c_str());
+				int result = std::system(cmd.c_str());
 				// For debugging:
-				std::cout << cmd << std::endl; int result = 0;
+				//std::cout << cmd << std::endl; int result = 0;
 				
 				// system() will return 0 if successful, -1 if failed
 				if (result == 0) {

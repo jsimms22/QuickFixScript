@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
             std::cerr << "Error: Expected file at location " + l_pub_full_path + " to exist"; 
             std::cout << " and contain the last published paper in the targeted Volume " + vol_str << std::endl;
             // Remove for debugging:
-            //return 1;
+            return 1;
         }
         prev_published_paper = true;
     } else {

@@ -27,8 +27,8 @@ namespace rdf
 
 		if (pub.compare(acronyms[0]) == 0) {
 			dir = "C:/inetpub/vhosts/accessecon.com/httpdocs/RePEc/EBF/ebfull";
-			// Local testing directory only:
-			 dir = "C:/Users/work/Desktop/ebfull";
+			// Local testing and debugging directory only:
+			//dir = "C:/Users/work/Desktop/ebfull";
 		} else if (pub.compare(acronyms[1]) == 0) {
 			dir = "C:/inetpub/vhosts/accessecon.com/httpdocs/RePEc/ebl/ecbull";
 		} else if (pub.compare(acronyms[2]) == 0) {
