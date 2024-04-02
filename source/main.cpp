@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
         std::cout << "Deduced last published paper in " + year_str + ", volume " + vol_str + " is: " + l_paper_pdf_path << std::endl;
 
         std::string l_pub_dir = pdf::get_dir(l_pub_id);
-        std::string l_pub_full_path = l_pub_dir + l_paper_pdf_path;
+        std::string l_pub_full_path = l_pub_dir + l_paper_pdf_path; // FIX THIS, repeated components in the path
         if (fs::exists(l_pub_full_path)) {
             std::cout << "Found: " + l_pub_full_path << std::endl;
         }
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
             std::cerr << "Error: Expected file at location " + l_pub_full_path + " to exist"; 
             std::cout << " and contain the last published paper in the targeted Volume " + vol_str << std::endl;
             // Remove for debugging:
-            return 1;
+            // return 1; 
         }
         prev_published_paper = true;
     } else {
@@ -202,7 +202,7 @@ int main(int argc, char* argv[])
                     // Build calendar stamp for new publish date
                     // Year_str is required for it to populate properly on the site
                     // Site will order by publish date, not page #
-                    std::string new_Publish_Date = year_str + "-12-31";
+                    std::string new_Publish_Date = year_str + "-06-30"; // CHANGE THIS
                     // Get current time for the timestamp and convert to std::string format
                     std::time_t current_time = std::time(nullptr);
                     char pub_buffer[20];
@@ -256,9 +256,13 @@ int main(int argc, char* argv[])
                     std::string new_url = "http://";
                     new_url += "www.accessecon.com/Pubs/";
                     new_url += pub + "/" + year_str + "/Volume" + vol_str + "/" + temp_filename;
-                    std::string new_creation_date = year_str + "-12-31";
+                    std::string new_creation_date = year_str + "-06-30"; // CHANGE THIS
+                    std::string new_title = sql_agent::retrieve_article_field(query, result, result_id, "Title");
+                    std::string new_abstract = sql_agent::retrieve_article_field(query, result, result_id, "Abstract");
 
                     // Update rdf for each line that contains the following fields
+                    if (new_title != "") rdf::update_rdf_line(result_id, "Title:", new_title);
+                    if (new_abstract != "") rdf::update_rdf_line(result_id, "Abstract:", new_abstract);
                     rdf::update_rdf_line(result_id, "Creation-Date:", new_creation_date);
                     rdf::update_rdf_line(result_id, "File-URL:", new_url);
                     if ((std::stoi(page_range[1]) - std::stoi(page_range[0])) == 0) {
@@ -302,9 +306,11 @@ int main(int argc, char* argv[])
             }
 
             // Setting current iterated entry to be last published entry
-            if (db_path_updated && local_path_updated && rdf_updated) {
+            if (local_path_updated && rdf_updated) {
                 last_paper_id = result_id;
                 last_pub_page = sql_agent::retrieve_field(query, result, temp_filename, "TotalNumpages");
+                newPaperNum += 1;
+                paper_num_str = std::to_string(newPaperNum);
             }
         }
     } else {
@@ -372,7 +378,7 @@ int main(int argc, char* argv[])
                     // Build calendar stamp for new publish date
                     // Year_str is required for it to populate properly on the site
                     // Site will order by publish date, not page #
-                    std::string new_Publish_Date = year_str + "-12-31";
+                    std::string new_Publish_Date = year_str + "-06-30"; // CHANGE THIS
                     // Get current time for the timestamp and convert to std::string format
                     std::time_t current_time = std::time(nullptr);
                     char pub_buffer[20];
@@ -426,9 +432,13 @@ int main(int argc, char* argv[])
                     std::string new_url = "http://";
                     new_url += "www.accessecon.com/Pubs/";
                     new_url += pub + "/" + year_str + "/Volume" + vol_str + "/" + temp_filename;
-                    std::string new_creation_date = year_str + "-12-31";
+                    std::string new_creation_date = year_str + "-06-30"; // CHANGE THIS
+                    std::string new_title = sql_agent::retrieve_article_field(query, result, result_id, "Title");
+                    std::string new_abstract = sql_agent::retrieve_article_field(query, result, result_id, "Abstract");
 
                     // Update rdf for each line that contains the following fields
+                    if (new_title != "") rdf::update_rdf_line(result_id, "Title:", new_title);
+                    if (new_abstract != "") rdf::update_rdf_line(result_id, "Abstract:", new_abstract);
                     rdf::update_rdf_line(result_id, "Creation-Date:", new_creation_date);
                     rdf::update_rdf_line(result_id, "File-URL:", new_url);
                     if ((std::stoi(page_range[1]) - std::stoi(page_range[0])) == 0) {

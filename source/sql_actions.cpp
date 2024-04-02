@@ -39,6 +39,23 @@ namespace sql_agent
         return output;
     }
 
+    std::string retrieve_article_field(
+        sql::Statement* query,
+        sql::ResultSet* result,
+        const std::string id,
+        const std::string field)
+    {
+        std::string output = "";
+        result = query->executeQuery
+        ("SELECT " + field + " FROM tablepaperofarticles WHERE Article_ID LIKE '" + id + "' LIMIT 1; ");
+
+        // Retrieve the row
+        if (result->next()) { output = result->getString(1); }
+        else { std::cout << "No rows found." << std::endl; }
+
+        return output;
+    }
+
     // Execute query to UPDATE field with input_str for the given id
     void update_field_by_ID(
         sql::Statement* query,
