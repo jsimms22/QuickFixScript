@@ -52,7 +52,7 @@ namespace file
     // Deterministically orders the files in vector by their paper number
     void sort_files(std::vector<std::filesystem::directory_entry>& entries) 
     {
-        std::sort(entries.begin(), entries.end(), compareFilenames);
+        std::sort(entries.begin(), entries.end(), compare_filenames);
     }
 
     // Renames the entry's filename in filesystem with the a new year, volume, and issue number
