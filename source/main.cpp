@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
     std::string year_str = std::to_string((newVolumeNum - 20) + 2000);
     std::string vol_str = std::to_string(newVolumeNum);
     std::string iss_str = std::to_string(newIssueNum);
-    std::string date_stamp = 
+    std::array<std::string, 2> date_array = { pdf::date_short(newIssueNum), pdf::date_month(newIssueNum) };
 
     bool prev_published_paper = false;
     // Check assumed last published paper and initial newPaperNum passes basic sanity checks
@@ -210,7 +210,7 @@ int main(int argc, char* argv[])
                     // Build calendar stamp for new publish date
                     // Year_str is required for it to populate properly on the site
                     // Site will order by publish date, not page #
-                    std::string new_Publish_Date = year_str + "-06-30"; // CHANGE THIS
+                    std::string new_Publish_Date = year_str + pdf::date_short(newIssueNum); // CHANGE THIS
                     // Get current time for the timestamp and convert to std::string format
                     std::time_t current_time = std::time(nullptr);
                     char pub_buffer[20];
@@ -264,7 +264,7 @@ int main(int argc, char* argv[])
                     std::string new_url = "http://";
                     new_url += "www.accessecon.com/Pubs/";
                     new_url += pub + "/" + year_str + "/Volume" + vol_str + "/" + temp_filename;
-                    std::string new_creation_date = year_str + "-06-30"; // CHANGE THIS
+                    std::string new_creation_date = year_str + pdf::date_short(newIssueNum);
                     std::string new_title = sql_agent::retrieve_article_field(query, result, result_id, "Title");
                     std::string new_abstract = sql_agent::retrieve_article_field(query, result, result_id, "Abstract");
 
@@ -386,7 +386,7 @@ int main(int argc, char* argv[])
                     // Build calendar stamp for new publish date
                     // Year_str is required for it to populate properly on the site
                     // Site will order by publish date, not page #
-                    std::string new_Publish_Date = year_str + "-06-30"; // CHANGE THIS
+                    std::string new_Publish_Date = year_str + pdf::date_short(newIssueNum); // CHANGE THIS
                     // Get current time for the timestamp and convert to std::string format
                     std::time_t current_time = std::time(nullptr);
                     char pub_buffer[20];
@@ -440,7 +440,7 @@ int main(int argc, char* argv[])
                     std::string new_url = "http://";
                     new_url += "www.accessecon.com/Pubs/";
                     new_url += pub + "/" + year_str + "/Volume" + vol_str + "/" + temp_filename;
-                    std::string new_creation_date = year_str + "-06-30"; // CHANGE THIS
+                    std::string new_creation_date = year_str + pdf::date_short(newIssueNum); // CHANGE THIS
                     std::string new_title = sql_agent::retrieve_article_field(query, result, result_id, "Title");
                     std::string new_abstract = sql_agent::retrieve_article_field(query, result, result_id, "Abstract");
 

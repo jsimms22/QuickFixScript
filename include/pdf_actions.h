@@ -20,8 +20,11 @@ namespace pdf
 		HTML
 	};
 	
+	// Determines what the datestamp of format: -MM-DD for publication date
+	std::string date_short(const int);
+
 	// Determines what month of the year should be used for publication date
-	std::string determine_date(const int);
+	std::string date_month(const int);
 
 	// Retrieves the filename and path for either the .pdf or .html version of the title page
 	std::string get_dir(const std::string&);

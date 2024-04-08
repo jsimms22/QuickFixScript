@@ -3,10 +3,42 @@
 
 namespace pdf
 {
-	// Determines what month of the year should be used for publication date
-	std::string determine_date(const int new_iss)
+	// Determines what the datestamp of format: -MM-DD for publication date
+	std::string date_short(const int new_iss)
 	{
-		/* TODO */
+		switch (new_iss) {
+		case 0: // Issue 0
+			return "-12-30";
+		case 1: // Issue 1
+			return "-03-30";
+		case 2: // Issue 2
+			return "-06-30";
+		case 3: // Issue 3
+			return "-09-30";
+		case 4: // Issue 4
+			return "-12-30";
+		default:
+			return "-12-30";
+		}
+	}
+
+	// Determines what month of the year should be used for publication date
+	std::string date_month(const int new_iss)
+	{
+		switch (new_iss) {
+		case 0: // Issue 0
+			return "December";
+		case 1: // Issue 1
+			return "March";
+		case 2: // Issue 2
+			return "June";
+		case 3: // Issue 3
+			return "September";
+		case 4: // Issue 4
+			return "December";
+		default:
+			return "December";
+		}
 	}
 
 	std::string get_dir(const std::string& id)
@@ -106,7 +138,7 @@ namespace pdf
 			cit_pages = "pages " + page_range[1];
 		}
 		std::string cit_year = ", (" + std::to_string((new_vol - 20) + 2000) + ") ''";
-		std::string date_publication = "<b>Published:</b> June 30, " + std::to_string((new_vol - 20) + 2000); // CHANGE THIS
+		std::string date_publication = "<b>Published:</b> " + pdf::date_month(new_iss) + " 30, " + std::to_string((new_vol - 20) + 2000);
 
 		// Replacement for volume
 		std::string updated_content = std::regex_replace(html_content, volume_pattern, cit_vol);
