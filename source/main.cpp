@@ -189,11 +189,7 @@ int main(int argc, char* argv[])
                         page_range[0] = std::to_string(first_page_num);
                         // Execute query to UPDATE TotalNumpages for the given ID
                         sql_agent::update_field_by_ID(query, result_id, "TotalNumpages", page_range[1]);
-                        if ((std::stoi(page_range[1]) - std::stoi(page_range[0])) == 0) {
-                            new_citationString += ", pages " + page_range[1];
-                        } else {
-                            new_citationString += ", pages " + page_range[0] + " - " + page_range[1];
-                        }
+                        new_citationString += ", pages " + page_range[0] + " - " + page_range[1];
                     }
                     // Execute query to UPDATE citationString for the given ID
                     std::cout << "New Citation String (ID: " + result_id + "): " + new_citationString << std::endl;
@@ -272,11 +268,7 @@ int main(int argc, char* argv[])
                     if (new_abstract != "") rdf::update_rdf_line(result_id, "Abstract:", new_abstract);
                     rdf::update_rdf_line(result_id, "Creation-Date:", new_creation_date);
                     rdf::update_rdf_line(result_id, "File-URL:", new_url);
-                    if ((std::stoi(page_range[1]) - std::stoi(page_range[0])) == 0) {
-                        rdf::update_rdf_line(result_id, "Pages:", page_range[1]);
-                    } else {
-                        rdf::update_rdf_line(result_id, "Pages:", page_range[0] + " - " + page_range[1]);
-                    }
+                    rdf::update_rdf_line(result_id, "Pages:", page_range[0] + " - " + page_range[1]);
                     rdf::update_rdf_line(result_id, "Year:", year_str);
                     rdf::update_rdf_line(result_id, "Volume:", vol_str);
                     rdf::update_rdf_line(result_id, "Issue:", iss_str);
@@ -365,11 +357,7 @@ int main(int argc, char* argv[])
                     if (page_range[1] != "" && page_count != "") {
                         int first_page_num = std::stoi(page_range[1]) - std::stoi(page_count) + 1;
                         page_range[0] = std::to_string(first_page_num);
-                        if ((std::stoi(page_range[1]) - std::stoi(page_range[0])) == 0) {
-                            new_citationString += ", pages " + page_range[1];
-                        } else {
-                            new_citationString += ", pages " + page_range[0] + " - " + page_range[1];
-                        }
+                        new_citationString += ", pages " + page_range[0] + " - " + page_range[1];
                     }
                     // Execute query to UPDATE citationString for the given ID
                     std::cout << "New Citation String (ID: " + result_id + "): " + new_citationString << std::endl;
@@ -448,11 +436,7 @@ int main(int argc, char* argv[])
                     if (new_abstract != "") rdf::update_rdf_line(result_id, "Abstract:", new_abstract);
                     rdf::update_rdf_line(result_id, "Creation-Date:", new_creation_date);
                     rdf::update_rdf_line(result_id, "File-URL:", new_url);
-                    if ((std::stoi(page_range[1]) - std::stoi(page_range[0])) == 0) {
-                        rdf::update_rdf_line(result_id, "Pages:", page_range[1]);
-                    } else {
-                        rdf::update_rdf_line(result_id, "Pages:", page_range[0] + " - " + page_range[1]);
-                    }
+                    rdf::update_rdf_line(result_id, "Pages:", page_range[0] + " - " + page_range[1]);
                     rdf::update_rdf_line(result_id, "Year:", year_str);
                     rdf::update_rdf_line(result_id, "Volume:", vol_str);
                     rdf::update_rdf_line(result_id, "Issue:", iss_str);

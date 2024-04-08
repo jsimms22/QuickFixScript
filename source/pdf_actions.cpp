@@ -135,11 +135,8 @@ namespace pdf
 		std::string cit_vol = "Volume " + std::to_string(new_vol);
 		std::string cit_iss = "Issue " + std::to_string(new_iss);
 		std::string cit_pages = "pages " + page_range[0] + "-" + page_range[1];
-		//if ((std::stoi(page_range[1]) - std::stoi(page_range[0])) == 0) {
-		//	cit_pages = "pages " + page_range[1];
-		//}
 		std::string cit_year = ", (" + std::to_string((new_vol - 20) + 2000) + ") ''";
-		std::string date_publication = "<b>Published:</b> " + date_array[1] + " 30, " + std::to_string((new_vol - 20) + 2000);
+		std::string publish_date = "<b>Published:</b> " + date_array[1] + " 30, " + std::to_string((new_vol - 20) + 2000);
 
 		// Replacement for volume
 		std::string updated_content = std::regex_replace(html_content, volume_pattern, cit_vol);
@@ -156,7 +153,7 @@ namespace pdf
 		// Replacement for publication year
 		updated_content = std::regex_replace(updated_content, year_pattern, cit_year);
 		// Replacement for publication year
-		updated_content = std::regex_replace(updated_content, date_pattern, date_publication);
+		updated_content = std::regex_replace(updated_content, date_pattern, publish_date);
 
 		return updated_content;
 	}
