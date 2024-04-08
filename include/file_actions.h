@@ -18,6 +18,12 @@ namespace file
 	// Verifiesd the filetype is .pdf
 	bool is_pdf(const std::string&);
 
+	// Uses regex to determine proper numerical order and avoids cases where -P9 is ordered after -P10, etc
+	bool compare_filenames(const std::filesystem::directory_entry&, const std::filesystem::directory_entry&);
+
+	// Deterministically orders the files in vector by their paper number
+	void sort_files(std::vector<std::filesystem::directory_entry>&);
+
 	// Fills a vector with filenames entries for every .pdf in a directory
 	void build_file_vec(const std::string&, std::vector<fs::directory_entry>&);
 

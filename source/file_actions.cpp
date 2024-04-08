@@ -26,6 +26,35 @@ namespace file
         }
     }
 
+    // Uses regex to determine proper numerical order and avoids cases where -P9 is ordered after -P10, etc
+    bool compare_filenames(const std::filesystem::directory_entry& entry1, const std::filesystem::directory_entry& entry2) 
+    {
+        // Extract filenames
+        std::string filename1 = entry1.path().filename().string();
+        std::string filename2 = entry2.path().filename().string();
+
+        // Define regex pattern to match the numeric part after "P"
+        std::regex pattern(R"((\d+)(?:\.pdf)$)");
+
+        // Extract numeric parts from filenames
+        std::smatch match1, match2;
+        std::regex_search(filename1, match1, pattern);
+        std::regex_search(filename2, match2, pattern);
+
+        // Convert matched strings to integers
+        int number1 = std::stoi(match1[1]);
+        int number2 = std::stoi(match2[1]);
+
+        // Compare numbers
+        return number1 < number2;
+    }
+
+    // Deterministically orders the files in vector by their paper number
+    void sort_files(std::vector<std::filesystem::directory_entry>& entries) 
+    {
+        std::sort(entries.begin(), entries.end(), compareFilenames);
+    }
+
     // Renames the entry's filename in filesystem with the a new year, volume, and issue number
     void rename_file(const fs::directory_entry& entry, const int new_vol, const int new_iss)
     {

@@ -70,6 +70,7 @@ int main(int argc, char* argv[])
     /* Build array of all .pdf files in array, and verify they match the expected naming convention */
     std::vector<fs::directory_entry> file_vec;
     file::build_file_vec(directoryPath, file_vec);
+    file::sort_files(file_vec);
 
     /* Use their path to retrieve each file's ID from the database, then execute updates */
     sql::Statement* query = mysql_db.get_connection()->createStatement();
