@@ -2,6 +2,7 @@
 
 namespace rdf
 {
+	// Extracts the publication's acronym from a paper's id
 	std::string get_acronym(const std::string& id, const char delimiter)
 	{
 		std::vector<std::string> pieces;
@@ -15,6 +16,8 @@ namespace rdf
 		return pieces[0];
 	}
 
+	// Determines the high level directory based on the id's acronym
+	// Only supports: EB, EBFT08, VUECON, and 777WPS
 	std::string get_rdf_dir(const std::string& id)
 	{
 		std::string dir;
@@ -47,6 +50,7 @@ namespace rdf
 		return dir;
 	}
 
+	// Determines the full path of an .rdf for the given paper's id
 	std::string get_rdf_path(const std::string& id) 
 	{
 		std::string path = rdf::get_rdf_dir(id);
@@ -130,7 +134,8 @@ namespace rdf
 		std::remove("temp.rdf");
 	}
 
-	// Expected search criteria: "Volume:" or "Issue:" or "Pages:"
+	// Updates a line in an rdf where the line contains a search criteria
+	// Expected search example criteria: "Volume:" or "Issue:" or "Pages:"
 	void update_rdf_line(const std::string& id, const std::string criteria, const std::string new_str)
 	{
 		std::string rdf_path = rdf::get_rdf_path(id);

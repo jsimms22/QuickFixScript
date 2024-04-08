@@ -10,8 +10,8 @@ namespace fs = std::filesystem;
 int main(int argc, char* argv[]) 
 {
     /* Testing and capturing .exe inputs */
-    if (argc != 8) {
-        std::cerr << "Usage: " << argv[0] << " <directory_path> <new_volume_number> <new_issue_number> <last_article_number> <db_schema_name> <username> <password>" << std::endl;
+    if (argc != 9) {
+        std::cerr << "Usage: " << argv[0] << " <directory_path> <new_volume_number> <new_issue_number> <last_article_number> <titlepage-offset> <db_schema_name> <username> <password>" << std::endl;
         return 1;
     }
     std::string directoryPath = argv[1];
@@ -42,9 +42,16 @@ int main(int argc, char* argv[])
         std::cerr << "If this is a new volume with no prior issues then set last article number to 0." << std::endl;
         return 1;
     }
-    std::string schema = argv[5];
-    std::string username = argv[6];
-    std::string password = argv[7];
+    // Check if the first page of the paper itself makes sense
+    // This value should equal the page number of the first page after any previously generated title pages
+    int titleOffset = std::stoi(argv[5]);
+    if (titleOffset < 0 || titleOffset > 4) {
+        std::cerr << "Error: unexpected value for title page offset. Verify the page number for the introduction section is in the range [0,4]." << std::endl;
+        return 1;
+    }
+    std::string schema = argv[6];
+    std::string username = argv[7];
+    std::string password = argv[8];
 
     /* Build MySQL Interface and try to connect to the DB Server */
     sql_agent::MySQL_Interface mysql_db;
@@ -62,7 +69,7 @@ int main(int argc, char* argv[])
 
     /* Build array of all .pdf files in array, and verify they match the expected naming convention */
     std::vector<fs::directory_entry> file_vec;
-    file::build_file_array(directoryPath, file_vec);
+    file::build_file_vec(directoryPath, file_vec);
 
     /* Use their path to retrieve each file's ID from the database, then execute updates */
     sql::Statement* query = mysql_db.get_connection()->createStatement();
@@ -72,6 +79,7 @@ int main(int argc, char* argv[])
     std::string year_str = std::to_string((newVolumeNum - 20) + 2000);
     std::string vol_str = std::to_string(newVolumeNum);
     std::string iss_str = std::to_string(newIssueNum);
+    std::string date_stamp = 
 
     bool prev_published_paper = false;
     // Check assumed last published paper and initial newPaperNum passes basic sanity checks
@@ -293,7 +301,7 @@ int main(int argc, char* argv[])
                     // Overwrites existing stand-alone pdf title page with updated html version
                     pdf::update_pdf(result_id);
                     // Removes the current title page from a published paper
-                    pdf::remove_title_page(entry, result_id, temp_filename);
+                    pdf::remove_title_page(entry, result_id, temp_filename, titleOffset);
                     // Cats the title created during update_pdf() with the original published paper (minus old title) 
                     pdf::update_title_page(entry, result_id, temp_filename);
                 } else {
@@ -468,7 +476,7 @@ int main(int argc, char* argv[])
                     // Overwrites existing stand-alone pdf title page with updated html version
                     pdf::update_pdf(result_id);
                     // Removes the current title page from a published paper
-                    pdf::remove_title_page(entry, result_id, temp_filename);
+                    pdf::remove_title_page(entry, result_id, temp_filename, titleOffset);
                     // Cats the title created during update_pdf() with the original published paper (minus old title) 
                     pdf::update_title_page(entry, result_id, temp_filename);
                 } else {

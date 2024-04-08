@@ -2,7 +2,8 @@
 
 namespace sql_agent
 {
-    // Execute a SELECT query to retrieve ID field for the entry
+    // Execute a SELECT query to retrieve a field for the entry from "tablepaper" table
+    // For when only one condition is needed to find the field's value
     std::string retrieve_field(
         sql::Statement* query,
         sql::ResultSet* result,
@@ -20,6 +21,8 @@ namespace sql_agent
         return output;
     }
 
+    // Execute a SELECT query to retrieve a field for the entry from "tablepaper" table
+    // For when two conditions is needed to find the field's value
     std::string retrieve_field(
         sql::Statement* query,
         sql::ResultSet* result, 
@@ -28,7 +31,6 @@ namespace sql_agent
         const std::string field)
     {
         std::string output = "";
-        // SELECT Published_PDF_File FROM acces24_minhviet.tablepaper WHERE Published_PDF_File LIKE '%-P8.pdf' AND Published_PDF_File LIKE '/Pubs/EBFT08/2024/Volume44%';
         result = query->executeQuery
         ("SELECT " + field + " FROM tablepaper WHERE Published_PDF_File LIKE '%-P" + paper_num + ".pdf' AND Published_PDF_File LIKE '" + pub_dir + "%'; ");
 
@@ -39,6 +41,8 @@ namespace sql_agent
         return output;
     }
 
+    // Retrieves a field from the "tablepaperofarticles" table
+    // Useful to retrieve a paper's abstract or title
     std::string retrieve_article_field(
         sql::Statement* query,
         sql::ResultSet* result,
@@ -56,7 +60,7 @@ namespace sql_agent
         return output;
     }
 
-    // Execute query to UPDATE field with input_str for the given id
+    // Execute query to UPDATE field in "tablepaper" table with input string for the given id
     void update_field_by_ID(
         sql::Statement* query,
         const std::string id,

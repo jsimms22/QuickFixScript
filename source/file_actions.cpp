@@ -2,8 +2,10 @@
 
 namespace file
 {
+    // Verifies the directory exists
     bool directory_exists(const std::string& dir) { return fs::is_directory(dir); }
 
+    // Verifiesd the filetype is .pdf
     bool is_pdf(const std::string& filename) {
         // Convert the filename to lowercase for case-insensitive comparison
         std::string lowercaseFilename = filename;
@@ -14,7 +16,8 @@ namespace file
             lowercaseFilename.substr(lowercaseFilename.size() - 4) == ".pdf";
     }
 
-    void build_file_array(const std::string& dir, std::vector<fs::directory_entry>& file_vec)
+    // Fills a vector with filenames entries for every .pdf in a directory
+    void build_file_vec(const std::string& dir, std::vector<fs::directory_entry>& file_vec)
     {
         for (const auto& entry : fs::directory_iterator(dir)) {
             if (fs::is_regular_file(entry) && is_pdf(entry.path().filename().string())) {
@@ -23,6 +26,7 @@ namespace file
         }
     }
 
+    // Renames the entry's filename in filesystem with the a new year, volume, and issue number
     void rename_file(const fs::directory_entry& entry, const int new_vol, const int new_iss)
     {
         assert(new_vol >= 0);
@@ -58,6 +62,7 @@ namespace file
         }
     }
 
+    // Renames the entry's filename in filesystem with the a new year, volume, issue, and paper number
     void rename_file(const fs::directory_entry& entry, const int new_vol, const int new_iss, const int new_paper_num)
     {
         assert(new_vol >= 0);
@@ -98,6 +103,7 @@ namespace file
         }
     }
 
+    // Renames a temp string for updating fields in a database since the entry class is non-mutable
     void rename_temp_filename(std::string& temp_filename, const int new_vol, const int new_iss)
     {
         assert(new_vol >= 0);
@@ -122,6 +128,7 @@ namespace file
         }
     }
 
+    // Renames a temp string for updating fields in a database since the entry class is non-mutable, overloads to update paper number
     void rename_temp_filename(std::string& temp_filename, const int new_vol, const int new_iss, const int new_paper_num)
     {
         assert(new_vol >= 0);

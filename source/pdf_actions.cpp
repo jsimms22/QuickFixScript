@@ -3,6 +3,12 @@
 
 namespace pdf
 {
+	// Determines what month of the year should be used for publication date
+	std::string determine_date(const int new_iss)
+	{
+		/* TODO */
+	}
+
 	std::string get_dir(const std::string& id)
 	{
 		std::string dir;
@@ -34,6 +40,7 @@ namespace pdf
 		return dir;
 	}
 
+	// Retrieves the filename and path for either the .pdf or .html version of the title page
 	std::string get_path(const std::string& id, const pdf::FileType file_type)
 	{
 		std::string path = pdf::get_dir(id);
@@ -49,6 +56,7 @@ namespace pdf
 		return path;
 	}
 
+	// Updates the top level volume and issue number for the title page
 	std::string update_title(const std::string& html_content, const int new_vol, const int new_iss)
 	{
 		// Define regular expressions for finding volume and issue numbers
@@ -184,6 +192,8 @@ namespace pdf
 		}
 	}
 
+	// Retrieve the full path of the targeted paper
+	// If the file is moved before the script is run, this will return return an empty string
 	std::string get_pub_paper_path(const fs::directory_entry entry, const std::string& id, const std::string filename)
 	{
 		std::string pdf_path = "";
@@ -198,7 +208,8 @@ namespace pdf
 		return pdf_path;
 	}
 
-	void remove_title_page(const fs::directory_entry entry, const std::string& id, const std::string filename)
+	// Uses a title offset to determine where the actual paper begins and removes any pages before this number
+	void remove_title_page(const fs::directory_entry entry, const std::string& id, const std::string filename, const int title_offset)
 	{
 		std::string pub = rdf::get_acronym(id, '-');
 		std::string base_path = pdf::get_dir(id);
@@ -226,7 +237,7 @@ namespace pdf
 			} else {
 				// Run the ghostscript exe that is already used by the server
 				std::string ghost_script_bin = "C:/inetpub/vhosts/accessecon.com/httpdocs/ghostscript/bin/gswin32c.exe";
-				std::string cmd_options = "-dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dFirstPage=2 -sOutputFile=";
+				std::string cmd_options = "-dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dFirstPage=" + std::to_string(title_offset) + " -sOutputFile=";
 				std::string cmd = ghost_script_bin + " " + cmd_options + pdf_out + " " + temp_pdf_in;
 
 				int result = std::system(cmd.c_str());
@@ -249,6 +260,7 @@ namespace pdf
 		}
 	}
 
+	// Concatenates a stand-alone title page .pdf with the paper .pdf
 	void update_title_page(const fs::directory_entry entry, const std::string& id, const std::string filename)
 	{
 		std::string pub = rdf::get_acronym(id, '-');
