@@ -46,8 +46,9 @@ namespace pdf
 	// This does NOT update the publication paper itself
 	void update_pdf(const std::string&);
 
-	// Retrieve the full path of the targeted paper
+	// Determine the full path of the targeted paper
 	// If the file is moved before the script is run, this will return return an empty string
+	// If the script is run a second time after being moved it will provide a path string
 	std::string get_pub_paper_path(const fs::directory_entry, const std::string&, const std::string);
 
 	// Uses a title offset to determine where the actual paper begins and removes any pages before this number

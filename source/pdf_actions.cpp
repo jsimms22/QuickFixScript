@@ -224,8 +224,9 @@ namespace pdf
 		}
 	}
 
-	// Retrieve the full path of the targeted paper
+	// Determine the full path of the targeted paper
 	// If the file is moved before the script is run, this will return return an empty string
+	// If the script is run a second time after being moved it will provide a path string
 	std::string get_pub_paper_path(const fs::directory_entry entry, const std::string& id, const std::string filename)
 	{
 		std::string pdf_path = "";
