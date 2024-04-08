@@ -66,15 +66,13 @@ int main(int argc, char* argv[])
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }
+    sql::Statement* query = mysql_db.get_connection()->createStatement();
+    sql::ResultSet* result = nullptr;
 
     /* Build array of all .pdf files in array, and verify they match the expected naming convention */
     std::vector<fs::directory_entry> file_vec;
     file::build_file_vec(directoryPath, file_vec);
     file::sort_files(file_vec);
-
-    /* Use their path to retrieve each file's ID from the database, then execute updates */
-    sql::Statement* query = mysql_db.get_connection()->createStatement();
-    sql::ResultSet* result = nullptr;
 
     // Convert integers to strings for updating the database for an entry
     std::string year_str = std::to_string((newVolumeNum - 20) + 2000);
@@ -82,8 +80,8 @@ int main(int argc, char* argv[])
     std::string iss_str = std::to_string(newIssueNum);
     std::array<std::string, 2> date_array = { pdf::date_short(newIssueNum), pdf::date_month(newIssueNum) };
 
-    bool prev_published_paper = false;
     // Check assumed last published paper and initial newPaperNum passes basic sanity checks
+    bool prev_published_paper = false;
     std::string l_paper_pub; 
     std::string l_paper_dir; 
     std::string l_paper_pdf_path; 
@@ -211,7 +209,7 @@ int main(int argc, char* argv[])
                     // Build calendar stamp for new publish date
                     // Year_str is required for it to populate properly on the site
                     // Site will order by publish date, not page #
-                    std::string new_Publish_Date = year_str + pdf::date_short(newIssueNum); // CHANGE THIS
+                    std::string new_Publish_Date = year_str + date_array[0]; // CHANGE THIS
                     // Get current time for the timestamp and convert to std::string format
                     std::time_t current_time = std::time(nullptr);
                     char pub_buffer[20];
@@ -265,7 +263,7 @@ int main(int argc, char* argv[])
                     std::string new_url = "http://";
                     new_url += "www.accessecon.com/Pubs/";
                     new_url += pub + "/" + year_str + "/Volume" + vol_str + "/" + temp_filename;
-                    std::string new_creation_date = year_str + pdf::date_short(newIssueNum);
+                    std::string new_creation_date = year_str + date_array[0];
                     std::string new_title = sql_agent::retrieve_article_field(query, result, result_id, "Title");
                     std::string new_abstract = sql_agent::retrieve_article_field(query, result, result_id, "Abstract");
 
@@ -298,7 +296,7 @@ int main(int argc, char* argv[])
             try {
                 if (local_path_updated && rdf_updated) {
                     // Updates the stand-alone html title page (if it exists)
-                    pdf::update_html(result_id, newVolumeNum, newIssueNum, page_range);
+                    pdf::update_html(result_id, newVolumeNum, newIssueNum, page_range, date_array);
                     // Overwrites existing stand-alone pdf title page with updated html version
                     pdf::update_pdf(result_id);
                     // Removes the current title page from a published paper
@@ -387,7 +385,7 @@ int main(int argc, char* argv[])
                     // Build calendar stamp for new publish date
                     // Year_str is required for it to populate properly on the site
                     // Site will order by publish date, not page #
-                    std::string new_Publish_Date = year_str + pdf::date_short(newIssueNum); // CHANGE THIS
+                    std::string new_Publish_Date = year_str + date_array[0]; // CHANGE THIS
                     // Get current time for the timestamp and convert to std::string format
                     std::time_t current_time = std::time(nullptr);
                     char pub_buffer[20];
@@ -441,7 +439,7 @@ int main(int argc, char* argv[])
                     std::string new_url = "http://";
                     new_url += "www.accessecon.com/Pubs/";
                     new_url += pub + "/" + year_str + "/Volume" + vol_str + "/" + temp_filename;
-                    std::string new_creation_date = year_str + pdf::date_short(newIssueNum); // CHANGE THIS
+                    std::string new_creation_date = year_str + date_array[0]; // CHANGE THIS
                     std::string new_title = sql_agent::retrieve_article_field(query, result, result_id, "Title");
                     std::string new_abstract = sql_agent::retrieve_article_field(query, result, result_id, "Abstract");
 
@@ -473,7 +471,7 @@ int main(int argc, char* argv[])
             try {
                 if (local_path_updated && rdf_updated) {
                     // Updates the stand-alone html title page (if it exists)
-                    pdf::update_html(result_id, newVolumeNum, newIssueNum, page_range);
+                    pdf::update_html(result_id, newVolumeNum, newIssueNum, page_range, date_array);
                     // Overwrites existing stand-alone pdf title page with updated html version
                     pdf::update_pdf(result_id);
                     // Removes the current title page from a published paper

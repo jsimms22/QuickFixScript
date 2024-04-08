@@ -36,11 +36,11 @@ namespace pdf
 	std::string update_title(const std::string&, const int, const int);
 
 	// Define regex for edge cases that occassional occur in the citation and are not handled by update_title()
-	std::string update_citation(const std::string&, const int, const int, const std::array<std::string,2>&);
+	std::string update_citation(const std::string&, const int, const int, const std::array<std::string,2>&, std::array<std::string,2>&);
 
 	// Updates the stand-alone title page in the html format
 	// This does NOT update the publication paper itself
-	void update_html(const std::string&, const int, const int, const std::array<std::string,2>&);
+	void update_html(const std::string&, const int, const int, const std::array<std::string,2>&, std::array<std::string,2>&);
 
 	// Updates the stand-alone title page in the pdf format by converting the updated html title
 	// This does NOT update the publication paper itself

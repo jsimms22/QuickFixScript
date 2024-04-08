@@ -111,7 +111,8 @@ namespace pdf
 		const std::string& html_content, 
 		const int new_vol, 
 		const int new_iss, 
-		const std::array<std::string,2>& page_range)
+		const std::array<std::string,2>& page_range,
+		std::array<std::string, 2>& date_array)
 	{
 		// Volume patterns
 		std::regex volume_pattern(R"(Vol.\s+\d+)"); //
@@ -128,17 +129,17 @@ namespace pdf
 		// Publication year
 		std::regex year_pattern(", \\(\\d{4}\\) ''"); // , (year)
 		// Publication String
-		std::regex date_pattern("<b>Published:</b> (\\w+ \\d{1,2}, \\d{4})\\");
+		std::regex date_pattern("<b>Published:</b> (\\w+ \\d{1,2}, \\d{4})");
 
 		// Create replacements for regex patterns
 		std::string cit_vol = "Volume " + std::to_string(new_vol);
 		std::string cit_iss = "Issue " + std::to_string(new_iss);
 		std::string cit_pages = "pages " + page_range[0] + "-" + page_range[1];
-		if ((std::stoi(page_range[1]) - std::stoi(page_range[0])) == 0) {
-			cit_pages = "pages " + page_range[1];
-		}
+		//if ((std::stoi(page_range[1]) - std::stoi(page_range[0])) == 0) {
+		//	cit_pages = "pages " + page_range[1];
+		//}
 		std::string cit_year = ", (" + std::to_string((new_vol - 20) + 2000) + ") ''";
-		std::string date_publication = "<b>Published:</b> " + pdf::date_month(new_iss) + " 30, " + std::to_string((new_vol - 20) + 2000);
+		std::string date_publication = "<b>Published:</b> " + date_array[1] + " 30, " + std::to_string((new_vol - 20) + 2000);
 
 		// Replacement for volume
 		std::string updated_content = std::regex_replace(html_content, volume_pattern, cit_vol);
@@ -154,6 +155,8 @@ namespace pdf
 		updated_content = std::regex_replace(updated_content, page_pattern_6, cit_pages);
 		// Replacement for publication year
 		updated_content = std::regex_replace(updated_content, year_pattern, cit_year);
+		// Replacement for publication year
+		updated_content = std::regex_replace(updated_content, date_pattern, date_publication);
 
 		return updated_content;
 	}
@@ -164,7 +167,8 @@ namespace pdf
 		const std::string& id, 
 		const int new_vol, 
 		const int new_iss, 
-		const std::array<std::string,2>& page_range)
+		const std::array<std::string,2>& page_range,
+		std::array<std::string, 2>& date_array)
 	{
 		std::string html_path = pdf::get_path(id, pdf::FileType::HTML);
 
@@ -178,7 +182,7 @@ namespace pdf
 		html_file.close();
 
 		std::string updated_html = pdf::update_title(html_content, new_vol, new_iss);
-		updated_html = pdf::update_citation(updated_html, new_vol, new_iss, page_range);
+		updated_html = pdf::update_citation(updated_html, new_vol, new_iss, page_range, date_array);
 
 		// Write updated HTML content to a temporary file
 		std::ofstream temp_file("temp.html");
