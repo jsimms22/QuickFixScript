@@ -24,8 +24,10 @@ namespace rdf
 	// Determines the full path of an .rdf for the given paper's id
 	std::string get_rdf_path(const std::string&);
 
-	// Read from the current state of an rdf into a temp file while updating lines containing the criteria
-	void write_to_temp(const std::string&, const std::string&, const std::string, const std::string);
+	// Read from the current state of an rdf into a temp file 
+	// while updating lines containing the criteria
+	void write_to_temp(const std::string&, const std::string&, 
+					   const std::string, const std::string);
 
 	// Read from a temp file and overwrite the current state of an rdf file
 	void read_from_temp(const std::string&, const std::string&);

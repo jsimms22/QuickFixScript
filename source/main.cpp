@@ -84,31 +84,32 @@ int main(int argc, char* argv[])
     bool prev_published_paper = false;
     std::string l_paper_pub; 
     std::string l_paper_dir; 
-    std::string l_paper_pdf_path; 
+    std::string l_paper_sql_path; 
     std::string l_pub_id;
     if (newPaperNum != 0) {
         l_paper_pub = rdf::get_acronym(file_vec[0].path().filename().string(), '-');
         l_paper_dir = "/Pubs/" + l_paper_pub + "/" + year_str + "/Volume" + vol_str;
         try {
-            l_paper_pdf_path = sql_agent::retrieve_field(query, result, std::to_string(newPaperNum), l_paper_dir, "Published_PDF_File");
-            l_pub_id = sql_agent::retrieve_field(query, result, l_paper_pdf_path, "ID");
+            l_paper_sql_path = sql_agent::retrieve_field(query, result, std::to_string(newPaperNum), l_paper_dir, "Published_PDF_File");
+            l_pub_id = sql_agent::retrieve_field(query, result, l_paper_sql_path, "ID");
         } catch (const sql::SQLException& e) {
             std::cerr << "Query error: " << e.what() << std::endl;
             std::cerr << "Could not find an ID for that last paper published in Volume " + vol_str << std::endl;
             return 1;
         }
-        std::cout << "Deduced last published paper in " + year_str + ", volume " + vol_str + " is: " + l_paper_pdf_path << std::endl;
+        std::cout << "Deduced last published paper in " + year_str + ", volume " + vol_str + " is: " + l_paper_sql_path << std::endl;
 
         std::string l_pub_dir = pdf::get_dir(l_pub_id);
-        std::string l_pub_full_path = l_pub_dir + l_paper_pdf_path; // FIX THIS, repeated components in the path
+        std::string l_paper_filename = pdf::get_filename(l_paper_sql_path, '/');
+        // example: C:/inetpub/vhosts/accessecon.com/httpdocs/pubs/ID/YYYY/Volume##/filename
+        std::string l_pub_full_path = l_pub_dir + "/" + year_str + "/Volume" + vol_str + "/" + l_paper_filename;
         if (fs::exists(l_pub_full_path)) {
             std::cout << "Found: " + l_pub_full_path << std::endl;
-        }
-        else {
+        } else {
             std::cerr << "Error: Expected file at location " + l_pub_full_path + " to exist"; 
             std::cout << " and contain the last published paper in the targeted Volume " + vol_str << std::endl;
             // Remove for debugging:
-            // return 1; 
+            return 1;
         }
         prev_published_paper = true;
     } else {
@@ -118,14 +119,17 @@ int main(int argc, char* argv[])
     /* LOOP OPERATION OVERVIEW
     * 1) Verify the file entry is acceptable to use
     * 2) Reset loop variables
-    * 3) Retrieve the ID of the file from the database, if we find an ID do the following:
+    * 3) Retrieve the ID of the file from the database, 
+         if we find an ID do the following:
     *   3.1) Execute query to UPDATE Volume_Number
     *   3.2) Execute query to UPDATE NumIssue
     *   3.3) Execute query to UPDATE citationString
     *   3.4) Execute query to UPDATE Published_PDF_File
-    *       3.4.1) If we updated the published pdf filepath then set pub_path_updated = true;
+    *       3.4.1) If we updated the published pdf filepath 
+                   then set pub_path_updated = true;
     * 4) If pub_path_updated = true then,
-    *   4.1) Update the filename in file explorer to match the new Published_PDF_File field in the database
+    *   4.1) Update the filename in file explorer to match 
+             the new Published_PDF_File field in the database
     * 5) If local_path_update = true then,
     *   5.1) Update the associated rdf
     * 6) If local_path_updated = true && rdf_updated = true
@@ -133,7 +137,7 @@ int main(int argc, char* argv[])
     */
     if (prev_published_paper) {
         std::string last_paper_id = l_pub_id;
-        std::string last_pub_page = sql_agent::retrieve_field(query, result, l_paper_pdf_path, "TotalNumpages");
+        std::string last_pub_page = sql_agent::retrieve_field(query, result, l_paper_sql_path, "TotalNumpages");
         newPaperNum += 1;
         std::string paper_num_str = std::to_string(newPaperNum);
 

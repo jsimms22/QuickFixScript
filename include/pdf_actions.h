@@ -26,6 +26,10 @@ namespace pdf
 	// Determines what month of the year should be used for publication date
 	std::string date_month(const int);
 
+	// Extracts the paper's filename from a paper's given path
+	// it assumes the filename conforms to the standard convention
+	std::string get_filename(const std::string&, const char);
+
 	// Retrieves the filename and path for either the .pdf or .html version of the title page
 	std::string get_dir(const std::string&);
 
@@ -35,25 +39,37 @@ namespace pdf
 	// Updates the top level volume and issue number for the title page
 	std::string update_title(const std::string&, const int, const int);
 
-	// Define regex for edge cases that occassional occur in the citation and are not handled by update_title()
-	std::string update_citation(const std::string&, const int, const int, const std::array<std::string,2>&, std::array<std::string,2>&);
+	// Define regex for edge cases that occassional occur in 
+	// the citation and are not handled by update_title()
+	std::string update_citation(const std::string&, const int, const int, 
+								const std::array<std::string,2>&, 
+								std::array<std::string,2>&);
 
 	// Updates the stand-alone title page in the html format
 	// This does NOT update the publication paper itself
-	void update_html(const std::string&, const int, const int, const std::array<std::string,2>&, std::array<std::string,2>&);
+	void update_html(const std::string&, const int, const int, 
+					 const std::array<std::string,2>&, 
+					 std::array<std::string,2>&);
 
-	// Updates the stand-alone title page in the pdf format by converting the updated html title
+	// Updates the stand-alone title page in the pdf format 
+	// by converting the updated html title
 	// This does NOT update the publication paper itself
 	void update_pdf(const std::string&);
 
 	// Determine the full path of the targeted paper
-	// If the file is moved before the script is run, this will return return an empty string
-	// If the script is run a second time after being moved it will provide a path string
-	std::string get_pub_paper_path(const fs::directory_entry, const std::string&, const std::string);
+	// If the file is moved before the script is run, 
+	// this will return return an empty string
+	// If the script is run a second time after being 
+	// moved it will provide a path string
+	std::string get_pub_paper_path(const fs::directory_entry, 
+								   const std::string&, const std::string);
 
-	// Uses a title offset to determine where the actual paper begins and removes any pages before this number
-	void remove_title_page(const fs::directory_entry, const std::string&, const std::string, const int);
+	// Uses a title offset to determine where the actual paper begins 
+	// and removes any pages before this number
+	void remove_title_page(const fs::directory_entry, const std::string&, 
+						   const std::string, const int);
 
 	// Concatenates a stand-alone title page .pdf with the paper .pdf
-	void update_title_page(const fs::directory_entry, const std::string&, const std::string);
+	void update_title_page(const fs::directory_entry, const std::string&, 
+						   const std::string);
 }

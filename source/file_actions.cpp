@@ -50,7 +50,7 @@ namespace file
     }
 
     // Deterministically orders the files in vector by their paper number
-    void sort_files(std::vector<std::filesystem::directory_entry>& entries) 
+    void sort_files(std::vector<std::filesystem::directory_entry>& entries)
     {
         std::sort(entries.begin(), entries.end(), compare_filenames);
     }

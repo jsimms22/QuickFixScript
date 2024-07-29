@@ -41,6 +41,21 @@ namespace pdf
 		}
 	}
 
+	// Extracts the paper's filename from a paper's given path
+	// it assumes the filename conforms to the standard convention
+	std::string get_filename(const std::string& path, const char delimiter)
+	{
+		std::vector<std::string> pieces;
+		std::istringstream iss(path);
+		std::string token;
+
+		while (std::getline(iss, token, delimiter)) {
+			pieces.push_back(token);
+		}
+
+		return pieces.back(); 
+	}
+
 	std::string get_dir(const std::string& id)
 	{
 		std::string dir;
